@@ -1,0 +1,10 @@
+[package]
+name = "pidl"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+miette = { version = "7.4.0", features = ["fancy"] }
+postcard-schema = { version = "0.2.0", features = ["use-std"] }
+regex = "1.11.1"
+thiserror = "2.0.3"
