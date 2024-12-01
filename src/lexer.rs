@@ -1,3 +1,11 @@
+use crate::merrors;
+
+merrors! {
+    | Name                  | Error             | Label                 | Help                                      |
+    | ----                  | -----             | -----                 | ----                                      |
+    | BadDigit              | "Bad Digit!"      | "Unexpected input"    | "Expected Rust-like number"               |
+    | UnknownTopLevelToken  | "Unknown Token!"  | "Unexpected input"    | "Expected 'alias', 'struct', or 'enum'"   |
+}
 
 #[derive(Debug)]
 pub struct SpanToken<'a> {
@@ -31,60 +39,13 @@ pub struct Lexer<'a> {
     pub tokens: Vec<SpanToken<'a>>,
 }
 
-fn get_offset(src: &str, sub: &str) -> Option<(usize, usize)> {
+pub fn get_offset(src: &str, sub: &str) -> Option<(usize, usize)> {
     let src_addr = src.as_ptr() as usize;
     let sub_addr = sub.as_ptr() as usize;
     if !(src_addr..(src_addr + src.len())).contains(&sub_addr) {
         return None;
     }
     Some((sub_addr - src_addr, sub.len()))
-}
-
-use miette::{Diagnostic, SourceSpan};
-use thiserror::Error;
-
-#[derive(Error, Debug, Diagnostic)]
-#[error("UnknownToken!")]
-#[diagnostic(help("Expected 'alias', 'struct', or 'enum'"))]
-struct UnknownTopLevelToken {
-    // The Source that we're gonna be printing snippets out of.
-    // This can be a String if you don't have or care about file names.
-    #[source_code]
-    src: String,
-    // Snippets and highlights can be included in the diagnostic!
-    #[label("Unexpected input")]
-    bad_bit: SourceSpan,
-}
-
-impl UnknownTopLevelToken {
-    pub fn new(src: &str, chunk: &str) -> Self {
-        Self {
-            src: src.to_string(),
-            bad_bit: get_offset(src, chunk).unwrap().into(),
-        }
-    }
-}
-
-#[derive(Error, Debug, Diagnostic)]
-#[error("BadDigit!")]
-#[diagnostic(help("Expected 'alias', 'struct', or 'enum'"))]
-struct BadDigit {
-    // The Source that we're gonna be printing snippets out of.
-    // This can be a String if you don't have or care about file names.
-    #[source_code]
-    src: String,
-    // Snippets and highlights can be included in the diagnostic!
-    #[label("Unexpected input")]
-    bad_bit: SourceSpan,
-}
-
-impl BadDigit {
-    pub fn new(src: &str, chunk: &str) -> Self {
-        Self {
-            src: src.to_string(),
-            bad_bit: get_offset(src, chunk).unwrap().into(),
-        }
-    }
 }
 
 impl<'a> Lexer<'a> {
@@ -242,7 +203,7 @@ fn take_num<'a>(input: &'a str, window: &'a str) -> miette::Result<(SpanToken<'a
             rem
         };
         let fdigi = digits.chars().filter(|x| *x != '_').collect::<String>();
-        let num = usize::from_str_radix(&fdigi, 2).unwrap();
+        let num = usize::from_str_radix(&fdigi, 16).unwrap();
         let (offset, len) = get_offset(input, digits).unwrap();
         Ok((
             SpanToken {
