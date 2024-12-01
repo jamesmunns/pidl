@@ -7,14 +7,14 @@ merrors! {
     | UnknownTopLevelToken  | "Unknown Token!"  | "Unexpected input"    | "Expected 'alias', 'struct', or 'enum'"   |
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct SpanToken<'a> {
     // offset, len
     pub span: (usize, usize),
     pub token: Token<'a>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum Token<'a> {
     Word(&'a str),
     Comment(&'a str),

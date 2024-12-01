@@ -32,6 +32,13 @@ macro_rules! merrors {
                     &src[stok.span.0..][..stok.span.1],
                 )
             }
+
+            pub fn from_type_entry(src: &str, _tent: &$crate::TypeEntry) -> Self {
+                Self::new(
+                    src,
+                    todo!(),
+                )
+            }
         }
     )*)
 }
